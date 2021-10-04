@@ -39,3 +39,30 @@ print(out)
 
 net.zero_grad()
 out.backward(torch.randn(1, 10))
+
+output = net(input)
+target = torch.randn(10) # a dummy target, for example
+target = target.view(1, -1) # make it the same shape as the output 
+criterion = nn.MSELoss()
+
+loss = criterion(output, target)
+print(loss)
+
+print(loss.grad_fn) # MSE loss
+print(loss.grad_fn.next_functions[0][0]) # Linear
+print(loss.grad_fn.next_functions[0][0].next_functions[0][0]) # ReLU 
+
+
+import torch.optim as optim 
+
+# create your optimiser 
+
+optimizer = optim.SGD(net.parameters(), lr = 0.01)
+
+# in your training loop 
+
+optimizer.zero_grad() # zeros the gradient buffers
+output = net(input)
+loss = criterion(output, target)
+loss.backward()
+optimizer.step() # does the update 
